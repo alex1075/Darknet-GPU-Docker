@@ -20,8 +20,6 @@ ENV SOURCE_COMMIT $SOURCE_COMMIT
 ARG CONFIG
 
 RUN git clone https://github.com/alex1075/darknet.git && cd darknet \
-      && git checkout $SOURCE_BRANCH \
-      && git reset --hard $SOURCE_COMMIT \
       && /tmp/configure.sh $CONFIG && make \
       && cp darknet /usr/local/bin \
       && cd .. && rm -rf darknet

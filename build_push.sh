@@ -4,7 +4,7 @@ for var in cpu cpu-noopt gpu gpu-cc53 gpu-cc60 gpu-cc61 gpu-cc62 gpu-cc70 gpu-cc
           cpu-cv cpu-noopt-cv gpu-cv gpu-cv-cc53 gpu-cv-cc60 gpu-cv-cc61 gpu-cv-cc62 gpu-cv-cc70 gpu-cv-cc72 gpu-cv-cc75
 do
   DOCKER_REPO="alex1075/phd"
-  SOURCE_BRANCH="darknet_yolo_v4"
+  SOURCE_BRANCH="main"
   SOURCE_COMMIT=`git ls-remote https://github.com/alex1075/darknet.git ${SOURCE_BRANCH} | awk '{ print $1 }'`
   DOCKER_TAG=$SOURCE_BRANCH-$var
   VAR=$var

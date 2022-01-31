@@ -15,39 +15,12 @@ do
   echo $DOCKER_TAG
   echo $VAR
 
-if [[ "$DOCKER_TAG" == *cv* ]]; then
-  if [[ "$DOCKER_TAG" = *cpu-cv || "$DOCKER_TAG" = *cpu-noopt-cv ]]; then
-    echo "building cpu-cv or cpu-noopt-cv"
+echo "building gpu"
     docker build \
       --build-arg CONFIG=$VAR \
       --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
       --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
       -t $DOCKER_REPO:$DOCKER_TAG -f Dockerfile .
-  else
-    echo "building gpu-cv"
-    docker build \
-      --build-arg CONFIG=$VAR \
-      --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
-      --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
-      -t $DOCKER_REPO:$DOCKER_TAG -f Dockerfile .
-  fi
- else
-  if [[ "$DOCKER_TAG" = *cpu || "$DOCKER_TAG" = *cpu-noopt ]]; then
-    echo "building cpu or cpu-noopt"
-    docker build \
-      --build-arg CONFIG=$VAR \
-      --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
-      --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
-      -t $DOCKER_REPO:$DOCKER_TAG -f Dockerfile .
-  else
-    echo "building gpu"
-    docker build \
-      --build-arg CONFIG=$VAR \
-      --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
-      --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
-      -t $DOCKER_REPO:$DOCKER_TAG -f Dockerfile .
-  fi
-fi
 
 docker push $DOCKER_REPO:$DOCKER_TAG
 done

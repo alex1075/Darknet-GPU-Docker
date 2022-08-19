@@ -1,8 +1,9 @@
-FROM nvidia/cuda:11.5.0-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.7.1-devel-ubuntu20.04
 LABEL maintainer="Alexander Hunt <alexander.hunt@ed.ac.uk>"
-
-RUN apt-get update && apt upgrade -y
-
+LABEL description="Docker image setup to use Darknet with Cuda 11.7.1, Cudnn 8 and OpenCV 4.6.0 on Ubuntu 20.04"
+RUN apt update && apt upgrade -y
+RUN apt install libcudnn8* wget unzip -y
+RUN apt install python3 python-is-python3 python3-pip -y
 RUN apt install wget git libssl-dev zip unzip libeigen3-dev libgflags-dev libgoogle-glog-dev -y
 RUN apt-get install libjpeg-dev libpng-dev libtiff-dev libopenjp2-7-dev
 RUN apt-get install libavcodec-dev libavformat-dev libswscale-dev
@@ -25,13 +26,13 @@ RUN cd && rm -rf cmake-3.22.2.tar.gz
 RUN git clone https://ceres-solver.googlesource.com/ceres-solver && cd ceres-solver && mkdir build && cd build
 RUN cd ceres-solver/build && cmake .. && make -j$(nporc) && make test && make install
 RUN cd 
-RUN wget https://github.com/opencv/opencv/archive/4.5.5.zip
-RUN unzip 4.5.5.zip
-RUN wget https://github.com/opencv/opencv_contrib/archive/refs/tags/4.5.5.tar.gz
-RUN tar -xzf 4.5.5.tar.gz
-RUN cd opencv-4.5.5 && mkdir build && cd build
+RUN pip3 install --upgrade pip
+RUN pip3 install numpy
+RUN wget https://github.com/opencv/opencv/archive/refs/tags/4.6.0.zip && unzip 4.6.0.zip
+RUN wget https://github.com/opencv/opencv_contrib/archive/refs/tags/4.6.0.tar.gz && tar -xvf 4.6.0.tar.gz
+RUN rm 4.6.0.zip 4.6.0.tar.gz
 
-RUN cd opencv-4.5.5 && cd build && cmake -D CMAKE_BUILD_TYPE=RELEASE \
+RUN cd opencv-4.6.0 && cd build && cmake -D CMAKE_BUILD_TYPE=RELEASE \
  -D CMAKE_INSTALL_PREFIX=/usr/local \
  -D WITH_TBB=ON \
  -D ENABLE_FAST_MATH=1 \
@@ -41,7 +42,7 @@ RUN cd opencv-4.5.5 && cd build && cmake -D CMAKE_BUILD_TYPE=RELEASE \
  -D BUILD_opencv_cudacodec=OFF \
  -D WITH_CUDNN=ON \
  -D OPENCV_DNN_CUDA=ON \
- -D CUDA_ARCH_BIN=5.1, 8.6 \
+ -D CUDA_ARCH_BIN=8.6 \
  -D WITH_V4L=ON \
  -D WITH_QT=OFF \
  -D WITH_OPENGL=ON \
@@ -51,12 +52,13 @@ RUN cd opencv-4.5.5 && cd build && cmake -D CMAKE_BUILD_TYPE=RELEASE \
  -D OPENCV_ENABLE_NONFREE=ON \
  -D INSTALL_PYTHON_EXAMPLES=OFF \
  -D INSTALL_C_EXAMPLES=OFF \
- -D OPENCV_EXTRA_MODULES_PATH=/root/opencv_contrib-4.5.5/modules \
+ -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-4.6.0/modules \
  -D BUILD_EXAMPLES=OFF  ..
-RUN cd opencv-4.5.5 && cd build && cmake --build . --target install --parallel $(nproc)
-RUN cd && rm -rf opencv-4.5.5.zip  4.5.5.tar.gz   
+RUN cd opencv-4.6.0 && cd build && cmake --build . --target install --parallel $(nproc)
 
-RUN git clone https://github.com/alex1075/darknet.git && cd darknet
-RUN cd darknet && mkdir build_release && cd build_release && cmake  ..
-# RUN cd darknet && cd build_release && cmake --build . --target install --parallel $(nproc)
-ENTRYPOINT bash
+RUN git clone https://github.com/AlexeyAB/darknet && cd darknet && mkdir build_release && cd build_release
+RUN cd darknet/build_release && cmake .. && make -j$(nproc)
+CMD ["bash"]
+
+
+

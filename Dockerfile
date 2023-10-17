@@ -37,6 +37,7 @@ WORKDIR /root/darknet
 COPY Makefile /root/darknet/Makefile
 RUN make
 RUN ln -s /root/darknet/darknet /usr/bin
+WORKDIR /root/
 CMD ["bash"]
 
 
